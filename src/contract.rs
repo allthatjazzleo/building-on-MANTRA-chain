@@ -21,9 +21,11 @@ pub fn instantiate(
     Ok(Response::default())
 }
 
-pub fn query(_deps: Deps, _env: Env, _msg: Binary) -> StdResult<Binary> {
-    match STATE.load(_deps.storage) {
-        Ok(state) => to_json_binary(&state.message),
-        Err(_) => Err(StdError::not_found("state")),
+#[cfg_attr(not(feature = "library"), entry_point)]
+pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
+    match msg {
+        QueryMsg::QueryUserList { user, start_after, limit } => {
+            to_binary(&query_user_list(deps, user, start_after, limit)?)
+        }
     }
 }
